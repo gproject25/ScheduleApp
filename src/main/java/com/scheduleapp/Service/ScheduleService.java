@@ -63,11 +63,24 @@ public class ScheduleService {
 
         //비밀번호 확인
         if(!schedule.getPassword().equals(request.getPassword())){
-            throw new IllegalStateException("\"비밀번호가 일치하지 않습니다.");
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
 
         //update DTO 반환
         schedule.update(request.getTitle(), request.getAuthor());
         return new UpdateScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt());
+    }
+
+    @Transactional
+    public void deleteSchedule(Long scheduleId) {
+        //일정이 존재한는지 조회
+        boolean existence = scheduleRepository.existsById(scheduleId);
+
+        if(!existence){
+            throw new IllegalStateException("일정이 없습니다.");
+        }
+
+        //존재하면 삭제
+        scheduleRepository.deleteById(scheduleId);
     }
 }
