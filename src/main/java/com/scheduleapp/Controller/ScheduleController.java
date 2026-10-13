@@ -1,6 +1,10 @@
 package com.scheduleapp.Controller;
 
-import com.scheduleapp.DTO.*;
+import com.scheduleapp.DTO.Request.CreateScheduleRequest;
+import com.scheduleapp.DTO.Request.UpdateScheduleRequest;
+import com.scheduleapp.DTO.Response.CreateScheduleResponse;
+import com.scheduleapp.DTO.Response.GetScheduleResponse;
+import com.scheduleapp.DTO.Response.UpdateScheduleResponse;
 import com.scheduleapp.Service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

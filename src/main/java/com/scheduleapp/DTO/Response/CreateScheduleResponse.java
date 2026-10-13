@@ -1,13 +1,12 @@
-package com.scheduleapp.DTO;
+package com.scheduleapp.DTO.Response;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
 import java.time.LocalDateTime;
 
 @Getter
 @RequiredArgsConstructor
-public class UpdateScheduleResponse {
+public class CreateScheduleResponse {
     private final Long id;
     private final String title;
     private final String contents;

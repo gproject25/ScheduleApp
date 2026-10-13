@@ -1,6 +1,10 @@
 package com.scheduleapp.Service;
 
-import com.scheduleapp.DTO.*;
+import com.scheduleapp.DTO.Request.CreateScheduleRequest;
+import com.scheduleapp.DTO.Request.UpdateScheduleRequest;
+import com.scheduleapp.DTO.Response.CreateScheduleResponse;
+import com.scheduleapp.DTO.Response.GetScheduleResponse;
+import com.scheduleapp.DTO.Response.UpdateScheduleResponse;
 import com.scheduleapp.Entity.Schedule;
 import com.scheduleapp.Repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
