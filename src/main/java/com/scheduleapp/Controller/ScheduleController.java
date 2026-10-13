@@ -1,8 +1,6 @@
 package com.scheduleapp.Controller;
 
-import com.scheduleapp.DTO.CreateScheduleResponse;
-import com.scheduleapp.DTO.CreateScheduleRequest;
-import com.scheduleapp.DTO.GetScheduleResponse;
+import com.scheduleapp.DTO.*;
 import com.scheduleapp.Service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,4 +28,10 @@ public class ScheduleController {
     public ResponseEntity<List<GetScheduleResponse>> getAllSchedules(@RequestParam(required = false) String author){
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getAllSchedules(author));
     }
+
+    @PutMapping("/schedules/{scheduleId}")
+    public ResponseEntity<UpdateScheduleResponse> updateSchedule(@PathVariable Long scheduleId, @RequestBody UpdateScheduleRequest request){
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.updateSchedule(scheduleId,request));
+    }
+
 }
