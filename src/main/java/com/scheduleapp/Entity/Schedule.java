@@ -1,0 +1,35 @@
+package com.scheduleapp.Entity;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Entity
+@Table(name = "schedules")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Schedule extends BaseEntity{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String title;
+    private String contents;
+    private String author;
+    private String password;
+
+
+    public Schedule(String title, String contents, String author, String password){
+        this.title = title;
+        this.contents = contents;
+        this.author = author;
+        this.password = password;
+    }
+
+    public void update(String title, String author){
+        this.title = title;
+        this.author = author;
+    }
+}
