@@ -73,7 +73,7 @@ public class ScheduleService {
 
     @Transactional
     public void deleteSchedule(Long scheduleId) {
-        //일정이 존재한는지 조회
+        //일정이 존재하는지 조회
         boolean existence = scheduleRepository.existsById(scheduleId);
 
         if(!existence){
