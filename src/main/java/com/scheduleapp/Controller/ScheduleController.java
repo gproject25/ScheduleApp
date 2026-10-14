@@ -21,7 +21,7 @@ public class ScheduleController {
 
     @PostMapping("/schedules")
     public ResponseEntity<CreateScheduleResponse> createSchedule(@RequestBody CreateScheduleRequest request){
-        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.createScehdule(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.createSchedule(request));
     }
 
     @GetMapping("/schedules/{scheduleId}")

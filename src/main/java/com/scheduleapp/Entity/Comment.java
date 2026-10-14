@@ -24,15 +24,14 @@ public class Comment extends BaseEntity{
     private String password;
 
     //schedulId 컬럼에 연결된 일정 ID를 저장
-    @ManyToOne
-    @JoinColumn(name="scheduleId", nullable = false)
-    private Schedule schedule;
+    @Column(name = "schedule_id", nullable = false)
+    private Long scheduleId;
 
-    public Comment(String contents, String author, String password, Schedule schedule) {
+    public Comment(String contents, String author, String password, Long scheduleId) {
         this.contents = contents;
         this.author = author;
         this.password = password;
-        this.schedule = schedule;
+        this.scheduleId = scheduleId;
     }
 
     public void update(String contents, String author){

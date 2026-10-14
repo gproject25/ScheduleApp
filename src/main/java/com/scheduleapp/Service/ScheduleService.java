@@ -23,7 +23,7 @@ public class ScheduleService {
     private final Validate validate;
 
     @Transactional
-    public CreateScheduleResponse createScehdule(CreateScheduleRequest request) {
+    public CreateScheduleResponse createSchedule(CreateScheduleRequest request) {
         //입력에 대한 검증
         validate.validateSchedule(request.getTitle(), request.getContents(), request.getAuthor(), request.getPassword(), false);
 
@@ -44,12 +44,12 @@ public class ScheduleService {
                 () -> new IllegalStateException("일정이 없습니다."));
 
         //댓글 불러오기
-        List<Comment> comments = commentRepository.findByScehduleId(scheduleId);
+        List<Comment> comments = commentRepository.findByScheduleId(scheduleId);
 
         //dtos 설정
         List<GetCommentResponse> dtos = new ArrayList<>();
         for (Comment comment : comments) {
-            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getSchedule().getId(),comment.getCreatedAt(),comment.getModifiedAt());
+            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getScheduleId(),comment.getCreatedAt(),comment.getModifiedAt());
             dtos.add(dto);
         }
 
@@ -103,7 +103,7 @@ public class ScheduleService {
         }
 
         //댓글 먼저 삭제
-        commentRepository.deleteBySchedule_Id(scheduleId);
+        commentRepository.deleteByScheduleId(scheduleId);
 
         //존재하면 삭제
         scheduleRepository.deleteById(scheduleId);

@@ -39,10 +39,10 @@ public class CommentService {
         }
 
         //comment 생성 + DB에 저장
-        Comment comment = new Comment(request.getContents(), request.getAuthor(), request.getPassword(), schedule);
+        Comment comment = new Comment(request.getContents(), request.getAuthor(), request.getPassword(), schedule.getId());
         commentRepository.save(comment);
 
-        return new CreateCommentResponse(comment.getId(), comment.getContents(), comment.getAuthor(), comment.getSchedule().getId(), comment.getCreatedAt(), comment.getModifiedAt());
+        return new CreateCommentResponse(comment.getId(), comment.getContents(), comment.getAuthor(), comment.getScheduleId(), comment.getCreatedAt(), comment.getModifiedAt());
     }
 
     @Transactional(readOnly = true)
@@ -54,12 +54,12 @@ public class CommentService {
         }
 
         //comment 조회
-        List<Comment> comments = commentRepository.findByScehduleId(scheduleId);
+        List<Comment> comments = commentRepository.findByScheduleId(scheduleId);
 
         //dto list 형태로 반환
         List<GetCommentResponse> dtos = new ArrayList<>();
         for (Comment comment : comments) {
-            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getSchedule().getId(), comment.getCreatedAt(),comment.getModifiedAt());
+            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getScheduleId(), comment.getCreatedAt(),comment.getModifiedAt());
             dtos.add(dto);
         }
         return dtos;
@@ -72,7 +72,7 @@ public class CommentService {
         List<GetCommentResponse> dtos = new ArrayList<>();
 
         for (Comment comment : allComments) {
-            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getSchedule().getId(), comment.getCreatedAt(),comment.getModifiedAt());
+            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getScheduleId(), comment.getCreatedAt(),comment.getModifiedAt());
             dtos.add(dto);
         }
         return dtos;
@@ -89,9 +89,12 @@ public class CommentService {
             throw new IllegalStateException("일정이 없습니다.");
         }
 
-        //특정 comment 찾아오기
+        //특정 comment 찾아오기 + 겁증
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalStateException("댓글이 없습니다"));
+        if (!comment.getScheduleId().equals(scheduleId)) {
+            throw new IllegalArgumentException("해당 일정에 속한 댓글이 아닙니다.");
+        }
 
         //비밀번호 확인
         if(!comment.getPassword().equals(request.getPassword())){
@@ -100,7 +103,7 @@ public class CommentService {
 
         //update DTO 반환 + 더티체킹
         comment.update(request.getContents(), request.getAuthor());
-        return new UpdateCommentResponse(comment.getId(), comment.getContents(), comment.getAuthor(), comment.getSchedule().getId(), comment.getCreatedAt(), comment.getModifiedAt());
+        return new UpdateCommentResponse(comment.getId(), comment.getContents(), comment.getAuthor(), comment.getScheduleId(), comment.getCreatedAt(), comment.getModifiedAt());
     }
 
     @Transactional
@@ -111,11 +114,14 @@ public class CommentService {
             throw new IllegalStateException("일정이 없습니다.");
         }
 
-        //댓글이 존재하는지 조회
-        boolean existenceComment = commentRepository.existsById(commentId);
-        if(!existenceComment){
-            throw new IllegalStateException("댓글이 없습니다.");
+        //댓글이 존재하는지 조회 + 검증
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new IllegalStateException("댓글이 없습니다.")
+        );
+        if (!comment.getScheduleId().equals(scheduleId)) {
+            throw new IllegalArgumentException("해당 일정에 속한 댓글이 아닙니다.");
         }
+        
         commentRepository.deleteById(commentId);
     }
 }
