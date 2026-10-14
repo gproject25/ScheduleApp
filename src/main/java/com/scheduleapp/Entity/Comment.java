@@ -17,6 +17,7 @@ public class Comment extends BaseEntity{
     private String author;
     private String password;
 
+    //schedulId 컬럼에 연결된 일정 ID를 저장
     @ManyToOne
     @JoinColumn(name="scheduleId", nullable = false)
     private Schedule schedule;
