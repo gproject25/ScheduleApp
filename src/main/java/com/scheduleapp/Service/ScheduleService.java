@@ -7,6 +7,7 @@ import com.scheduleapp.Entity.Comment;
 import com.scheduleapp.Entity.Schedule;
 import com.scheduleapp.Repository.CommentRepository;
 import com.scheduleapp.Repository.ScheduleRepository;
+import com.scheduleapp.Service.UserErrorHandling.Validate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +20,13 @@ import java.util.List;
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final CommentRepository commentRepository;
+    private final Validate validate;
 
     @Transactional
     public CreateScheduleResponse createScehdule(CreateScheduleRequest request) {
+        //입력에 대한 검증
+        validate.validateSchedule(request.getTitle(), request.getContents(), request.getAuthor(), request.getPassword(), false);
+
         //일정 생성
         Schedule schedule = new Schedule(request.getTitle(), request.getContents(),request.getAuthor(),request.getPassword());
 
@@ -72,6 +77,9 @@ public class ScheduleService {
 
     @Transactional
     public UpdateScheduleResponse updateSchedule(Long scheduleId, UpdateScheduleRequest request) {
+        //입력에 대한 검증
+        validate.validateSchedule(request.getTitle(), "", request.getAuthor(), request.getPassword(), true);
+
         //일정 조회
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("일정이 없습니다."));

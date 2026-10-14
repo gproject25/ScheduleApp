@@ -9,6 +9,7 @@ import com.scheduleapp.Entity.Comment;
 import com.scheduleapp.Entity.Schedule;
 import com.scheduleapp.Repository.CommentRepository;
 import com.scheduleapp.Repository.ScheduleRepository;
+import com.scheduleapp.Service.UserErrorHandling.Validate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +22,13 @@ import java.util.List;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final ScheduleRepository scheduleRepository;
+    private final Validate validate;
 
     @Transactional
     public CreateCommentResponse createComment(Long scheduleId, CreateCommentRequest request) {
+        //입력 검증
+        validate.validateComment(request.getContents(), request.getAuthor(), request.getPassword());
+
         //특정 일정 찾아오기
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalArgumentException("일정을 찾을 수 없습니다."));
@@ -75,6 +80,9 @@ public class CommentService {
 
     @Transactional
     public UpdateCommentResponse updateComment(Long scheduleId, Long commentId, UpdateCommentRequest request) {
+        //입력 검증
+        validate.validateComment(request.getContents(), request.getAuthor(), request.getPassword());
+
         //일정이 존재하는지만 확인
         boolean existence = scheduleRepository.existsById(scheduleId);
         if(!existence){
