@@ -1,8 +1,10 @@
 package com.scheduleapp.Service;
 
 import com.scheduleapp.DTO.Request.CreateCommentRequest;
+import com.scheduleapp.DTO.Request.UpdateCommentRequest;
 import com.scheduleapp.DTO.Response.CreateCommentResponse;
 import com.scheduleapp.DTO.Response.GetCommentResponse;
+import com.scheduleapp.DTO.Response.UpdateCommentResponse;
 import com.scheduleapp.Entity.Comment;
 import com.scheduleapp.Entity.Schedule;
 import com.scheduleapp.Repository.CommentRepository;
@@ -60,6 +62,7 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<GetCommentResponse> getAllComments() {
+        //전체 comments 조회
         List<Comment> allComments = commentRepository.findAll();
         List<GetCommentResponse> dtos = new ArrayList<>();
 
@@ -68,5 +71,27 @@ public class CommentService {
             dtos.add(dto);
         }
         return dtos;
+    }
+
+    @Transactional
+    public UpdateCommentResponse updateComment(Long scheduleId, Long commentId, UpdateCommentRequest request) {
+        //일정이 존재하는지만 확인
+        boolean existence = scheduleRepository.existsById(scheduleId);
+        if(!existence){
+            throw new IllegalStateException("일정이 없습니다.");
+        }
+
+        //특정 comment 찾아오기
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new IllegalStateException("댓글이 없습니다"));
+
+        //비밀번호 확인
+        if(!comment.getPassword().equals(request.getPassword())){
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        }
+
+        //update DTO 반환 + 더티체킹
+        comment.update(request.getContents(), request.getAuthor());
+        return new UpdateCommentResponse(comment.getId(), comment.getContents(), comment.getAuthor(), comment.getSchedule().getId(), comment.getCreatedAt(), comment.getModifiedAt());
     }
 }

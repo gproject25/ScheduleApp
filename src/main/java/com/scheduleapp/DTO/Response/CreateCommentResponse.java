@@ -1,6 +1,5 @@
 package com.scheduleapp.DTO.Response;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

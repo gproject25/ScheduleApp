@@ -10,8 +10,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT COUNT(c) FROM Comment c WHERE c.schedule.id = :scheduleId")
     long countComment(Long scheduleId);
 
-    //List<Comment> findBySchedule_Id(Long scheduleId);
-
+    //List<Comment> findBySchedule_Id(Long scheduleId); 같은 동작
     @Query("SELECT c FROM Comment c WHERE c.schedule.id = :scheduleId")
     List<Comment> findByScehduleId(Long scheduleId);
 

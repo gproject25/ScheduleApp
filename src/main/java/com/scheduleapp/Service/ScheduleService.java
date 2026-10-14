@@ -70,7 +70,7 @@ public class ScheduleService {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
 
-        //update DTO 반환
+        //update DTO 반환 + 더티체킹
         schedule.update(request.getTitle(), request.getAuthor());
         return new UpdateScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt());
     }
