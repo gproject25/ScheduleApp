@@ -94,4 +94,20 @@ public class CommentService {
         comment.update(request.getContents(), request.getAuthor());
         return new UpdateCommentResponse(comment.getId(), comment.getContents(), comment.getAuthor(), comment.getSchedule().getId(), comment.getCreatedAt(), comment.getModifiedAt());
     }
+
+    @Transactional
+    public void deleteComment(Long scheduleId, Long commentId) {
+        //일정이 존재하는지 조회
+        boolean existenceSchedule = scheduleRepository.existsById(scheduleId);
+        if(!existenceSchedule){
+            throw new IllegalStateException("일정이 없습니다.");
+        }
+
+        //댓글이 존재하는지 조회
+        boolean existenceComment = commentRepository.existsById(commentId);
+        if(!existenceComment){
+            throw new IllegalStateException("댓글이 없습니다.");
+        }
+        commentRepository.deleteById(commentId);
+    }
 }

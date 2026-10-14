@@ -38,4 +38,10 @@ public class CommentController {
     public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable Long scheduleId, @PathVariable Long commentId, @RequestBody UpdateCommentRequest request){
         return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(scheduleId,commentId,request));
     }
+
+    @DeleteMapping("/schedules/{scheduleId}/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long scheduleId, @PathVariable Long commentId){
+        commentService.deleteComment(scheduleId,commentId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
