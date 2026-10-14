@@ -13,8 +13,14 @@ public class Comment extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, length = 100)
     private String contents;
+
+    @Column(nullable = false)
     private String author;
+
+    @Column(nullable = false)
     private String password;
 
     //schedulId 컬럼에 연결된 일정 ID를 저장
