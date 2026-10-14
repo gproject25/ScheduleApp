@@ -2,6 +2,7 @@ package com.scheduleapp.Service;
 
 import com.scheduleapp.DTO.Request.CreateCommentRequest;
 import com.scheduleapp.DTO.Response.CreateCommentResponse;
+import com.scheduleapp.DTO.Response.GetCommentResponse;
 import com.scheduleapp.Entity.Comment;
 import com.scheduleapp.Entity.Schedule;
 import com.scheduleapp.Repository.CommentRepository;
@@ -9,6 +10,9 @@ import com.scheduleapp.Repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,5 +36,37 @@ public class CommentService {
         commentRepository.save(comment);
 
         return new CreateCommentResponse(comment.getId(), comment.getContents(), comment.getAuthor(), comment.getSchedule().getId(), comment.getCreatedAt(), comment.getModifiedAt());
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetCommentResponse> getScheduleComments(Long scheduleId) {
+        //일정이 존재하는지 조회
+        boolean existence = scheduleRepository.existsById(scheduleId);
+        if(!existence){
+            throw new IllegalStateException("일정이 없습니다.");
+        }
+
+        //comment 조회
+        List<Comment> comments = commentRepository.findByScehduleId(scheduleId);
+
+        //dto list 형태로 반환
+        List<GetCommentResponse> dtos = new ArrayList<>();
+        for (Comment comment : comments) {
+            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getSchedule().getId(), comment.getCreatedAt(),comment.getModifiedAt());
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetCommentResponse> getAllComments() {
+        List<Comment> allComments = commentRepository.findAll();
+        List<GetCommentResponse> dtos = new ArrayList<>();
+
+        for (Comment comment : allComments) {
+            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getSchedule().getId(), comment.getCreatedAt(),comment.getModifiedAt());
+            dtos.add(dto);
+        }
+        return dtos;
     }
 }
