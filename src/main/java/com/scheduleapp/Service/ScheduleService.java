@@ -1,22 +1,32 @@
 package com.scheduleapp.Service;
 
-import com.scheduleapp.DTO.*;
+import com.scheduleapp.DTO.Request.CreateScheduleRequest;
+import com.scheduleapp.DTO.Request.UpdateScheduleRequest;
+import com.scheduleapp.DTO.Response.*;
+import com.scheduleapp.Entity.Comment;
 import com.scheduleapp.Entity.Schedule;
+import com.scheduleapp.Repository.CommentRepository;
 import com.scheduleapp.Repository.ScheduleRepository;
+import com.scheduleapp.Service.UserErrorHandling.Validate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
-
+    private final CommentRepository commentRepository;
+    private final Validate validate;
 
     @Transactional
-    public CreateScheduleResponse createScehdule(CreateScheduleRequest request) {
+    public CreateScheduleResponse createSchedule(CreateScheduleRequest request) {
+        //입력에 대한 검증
+        validate.validateSchedule(request.getTitle(), request.getContents(), request.getAuthor(), request.getPassword(), false);
+
         //일정 생성
         Schedule schedule = new Schedule(request.getTitle(), request.getContents(),request.getAuthor(),request.getPassword());
 
@@ -33,12 +43,22 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("일정이 없습니다."));
 
+        //댓글 불러오기
+        List<Comment> comments = commentRepository.findByScheduleId(scheduleId);
+
+        //dtos 설정
+        List<GetCommentResponse> dtos = new ArrayList<>();
+        for (Comment comment : comments) {
+            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getScheduleId(),comment.getCreatedAt(),comment.getModifiedAt());
+            dtos.add(dto);
+        }
+
         //Get DTO response 반환
-        return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt());
+        return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt(), dtos);
     }
 
     @Transactional(readOnly = true)
-    public List<GetScheduleResponse> getAllSchedules(String author) {
+    public List<GetAllScheduleResponse> getAllSchedules(String author) {
         List<Schedule> schedules;
         //author이 포함되어 있으면 author 기준으로 전체 조회
         if(author != null && !author.isBlank()){
@@ -49,14 +69,17 @@ public class ScheduleService {
         }
 
         //stream 형식으로 DTO list 반환
-        List<GetScheduleResponse> list = schedules.stream()
-                .map(schedule -> new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt()))
+        List<GetAllScheduleResponse> list = schedules.stream()
+                .map(schedule -> new GetAllScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt()))
                 .toList();
         return list;
     }
 
     @Transactional
     public UpdateScheduleResponse updateSchedule(Long scheduleId, UpdateScheduleRequest request) {
+        //입력에 대한 검증
+        validate.validateSchedule(request.getTitle(), "", request.getAuthor(), request.getPassword(), true);
+
         //일정 조회
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("일정이 없습니다."));
@@ -66,7 +89,7 @@ public class ScheduleService {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
 
-        //update DTO 반환
+        //update DTO 반환 + 더티체킹
         schedule.update(request.getTitle(), request.getAuthor());
         return new UpdateScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt());
     }
@@ -75,10 +98,12 @@ public class ScheduleService {
     public void deleteSchedule(Long scheduleId) {
         //일정이 존재하는지 조회
         boolean existence = scheduleRepository.existsById(scheduleId);
-
         if(!existence){
             throw new IllegalStateException("일정이 없습니다.");
         }
+
+        //댓글 먼저 삭제
+        commentRepository.deleteByScheduleId(scheduleId);
 
         //존재하면 삭제
         scheduleRepository.deleteById(scheduleId);

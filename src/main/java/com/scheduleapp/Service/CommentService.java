@@ -1,0 +1,127 @@
+package com.scheduleapp.Service;
+
+import com.scheduleapp.DTO.Request.CreateCommentRequest;
+import com.scheduleapp.DTO.Request.UpdateCommentRequest;
+import com.scheduleapp.DTO.Response.CreateCommentResponse;
+import com.scheduleapp.DTO.Response.GetCommentResponse;
+import com.scheduleapp.DTO.Response.UpdateCommentResponse;
+import com.scheduleapp.Entity.Comment;
+import com.scheduleapp.Entity.Schedule;
+import com.scheduleapp.Repository.CommentRepository;
+import com.scheduleapp.Repository.ScheduleRepository;
+import com.scheduleapp.Service.UserErrorHandling.Validate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class CommentService {
+    private final CommentRepository commentRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final Validate validate;
+
+    @Transactional
+    public CreateCommentResponse createComment(Long scheduleId, CreateCommentRequest request) {
+        //입력 검증
+        validate.validateComment(request.getContents(), request.getAuthor(), request.getPassword());
+
+        //특정 일정 찾아오기
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new IllegalArgumentException("일정을 찾을 수 없습니다."));
+
+        //하나의 일정에는 댓글을 10개까지만 작성할 수 있음
+        if(commentRepository.countComment(scheduleId) >= 10){
+            throw new IllegalStateException("나의 일정에는 댓글을 10개까지만 작성할 수 있습니다");
+        }
+
+        //comment 생성 + DB에 저장
+        Comment comment = new Comment(request.getContents(), request.getAuthor(), request.getPassword(), schedule.getId());
+        commentRepository.save(comment);
+
+        return new CreateCommentResponse(comment.getId(), comment.getContents(), comment.getAuthor(), comment.getScheduleId(), comment.getCreatedAt(), comment.getModifiedAt());
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetCommentResponse> getScheduleComments(Long scheduleId) {
+        //일정이 존재하는지 조회
+        boolean existence = scheduleRepository.existsById(scheduleId);
+        if(!existence){
+            throw new IllegalStateException("일정이 없습니다.");
+        }
+
+        //comment 조회
+        List<Comment> comments = commentRepository.findByScheduleId(scheduleId);
+
+        //dto list 형태로 반환
+        List<GetCommentResponse> dtos = new ArrayList<>();
+        for (Comment comment : comments) {
+            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getScheduleId(), comment.getCreatedAt(),comment.getModifiedAt());
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
+    @Transactional(readOnly = true)
+    public List<GetCommentResponse> getAllComments() {
+        //전체 comments 조회
+        List<Comment> allComments = commentRepository.findAll();
+        List<GetCommentResponse> dtos = new ArrayList<>();
+
+        for (Comment comment : allComments) {
+            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getScheduleId(), comment.getCreatedAt(),comment.getModifiedAt());
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
+    @Transactional
+    public UpdateCommentResponse updateComment(Long scheduleId, Long commentId, UpdateCommentRequest request) {
+        //입력 검증
+        validate.validateComment(request.getContents(), request.getAuthor(), request.getPassword());
+
+        //일정이 존재하는지만 확인
+        boolean existence = scheduleRepository.existsById(scheduleId);
+        if(!existence){
+            throw new IllegalStateException("일정이 없습니다.");
+        }
+
+        //특정 comment 찾아오기 + 겁증
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new IllegalStateException("댓글이 없습니다"));
+        if (!comment.getScheduleId().equals(scheduleId)) {
+            throw new IllegalArgumentException("해당 일정에 속한 댓글이 아닙니다.");
+        }
+
+        //비밀번호 확인
+        if(!comment.getPassword().equals(request.getPassword())){
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        }
+
+        //update DTO 반환 + 더티체킹
+        comment.update(request.getContents(), request.getAuthor());
+        return new UpdateCommentResponse(comment.getId(), comment.getContents(), comment.getAuthor(), comment.getScheduleId(), comment.getCreatedAt(), comment.getModifiedAt());
+    }
+
+    @Transactional
+    public void deleteComment(Long scheduleId, Long commentId) {
+        //일정이 존재하는지 조회
+        boolean existenceSchedule = scheduleRepository.existsById(scheduleId);
+        if(!existenceSchedule){
+            throw new IllegalStateException("일정이 없습니다.");
+        }
+
+        //댓글이 존재하는지 조회 + 검증
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new IllegalStateException("댓글이 없습니다.")
+        );
+        if (!comment.getScheduleId().equals(scheduleId)) {
+            throw new IllegalArgumentException("해당 일정에 속한 댓글이 아닙니다.");
+        }
+        
+        commentRepository.deleteById(commentId);
+    }
+}
