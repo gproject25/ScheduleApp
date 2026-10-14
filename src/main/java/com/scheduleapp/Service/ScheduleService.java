@@ -90,10 +90,12 @@ public class ScheduleService {
     public void deleteSchedule(Long scheduleId) {
         //일정이 존재하는지 조회
         boolean existence = scheduleRepository.existsById(scheduleId);
-
         if(!existence){
             throw new IllegalStateException("일정이 없습니다.");
         }
+
+        //댓글 먼저 삭제
+        commentRepository.deleteBySchedule_Id(scheduleId);
 
         //존재하면 삭제
         scheduleRepository.deleteById(scheduleId);

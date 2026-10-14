@@ -14,4 +14,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c FROM Comment c WHERE c.schedule.id = :scheduleId")
     List<Comment> findByScehduleId(Long scheduleId);
 
+    void deleteBySchedule_Id(Long scheduleId);
 }
