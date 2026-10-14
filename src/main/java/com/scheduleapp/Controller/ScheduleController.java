@@ -3,6 +3,7 @@ package com.scheduleapp.Controller;
 import com.scheduleapp.DTO.Request.CreateScheduleRequest;
 import com.scheduleapp.DTO.Request.UpdateScheduleRequest;
 import com.scheduleapp.DTO.Response.CreateScheduleResponse;
+import com.scheduleapp.DTO.Response.GetAllScheduleResponse;
 import com.scheduleapp.DTO.Response.GetScheduleResponse;
 import com.scheduleapp.DTO.Response.UpdateScheduleResponse;
 import com.scheduleapp.Service.ScheduleService;
@@ -29,7 +30,7 @@ public class ScheduleController {
     }
 
     @GetMapping("/schedules")
-    public ResponseEntity<List<GetScheduleResponse>> getAllSchedules(@RequestParam(required = false) String author){
+    public ResponseEntity<List<GetAllScheduleResponse>> getAllSchedules(@RequestParam(required = false) String author){
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getAllSchedules(author));
     }
 

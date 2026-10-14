@@ -2,22 +2,23 @@ package com.scheduleapp.Service;
 
 import com.scheduleapp.DTO.Request.CreateScheduleRequest;
 import com.scheduleapp.DTO.Request.UpdateScheduleRequest;
-import com.scheduleapp.DTO.Response.CreateScheduleResponse;
-import com.scheduleapp.DTO.Response.GetScheduleResponse;
-import com.scheduleapp.DTO.Response.UpdateScheduleResponse;
+import com.scheduleapp.DTO.Response.*;
+import com.scheduleapp.Entity.Comment;
 import com.scheduleapp.Entity.Schedule;
+import com.scheduleapp.Repository.CommentRepository;
 import com.scheduleapp.Repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
-
+    private final CommentRepository commentRepository;
 
     @Transactional
     public CreateScheduleResponse createScehdule(CreateScheduleRequest request) {
@@ -37,12 +38,22 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalStateException("일정이 없습니다."));
 
+        //댓글 불러오기
+        List<Comment> comments = commentRepository.findByScehduleId(scheduleId);
+
+        //dtos 설정
+        List<GetCommentResponse> dtos = new ArrayList<>();
+        for (Comment comment : comments) {
+            GetCommentResponse dto = new GetCommentResponse(comment.getId(),comment.getContents(),comment.getAuthor(),comment.getSchedule().getId(),comment.getCreatedAt(),comment.getModifiedAt());
+            dtos.add(dto);
+        }
+
         //Get DTO response 반환
-        return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt());
+        return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt(), dtos);
     }
 
     @Transactional(readOnly = true)
-    public List<GetScheduleResponse> getAllSchedules(String author) {
+    public List<GetAllScheduleResponse> getAllSchedules(String author) {
         List<Schedule> schedules;
         //author이 포함되어 있으면 author 기준으로 전체 조회
         if(author != null && !author.isBlank()){
@@ -53,8 +64,8 @@ public class ScheduleService {
         }
 
         //stream 형식으로 DTO list 반환
-        List<GetScheduleResponse> list = schedules.stream()
-                .map(schedule -> new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt()))
+        List<GetAllScheduleResponse> list = schedules.stream()
+                .map(schedule -> new GetAllScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContents(), schedule.getAuthor(),schedule.getCreatedAt(), schedule.getModifiedAt()))
                 .toList();
         return list;
     }
