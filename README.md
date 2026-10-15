@@ -89,8 +89,7 @@ Notion 링크: https://bolder-shrimp-6f4.notion.site/Spring-6-CH-3-3f9df7a8441c8
       "author": "김철수",
       "createdAt": "2026-10-14T11:00:00",
       "modifiedAt": "2026-10-14T11:00:00"
-    },
-    ...
+    }
   ]
 }
 ```
