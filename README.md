@@ -344,4 +344,5 @@ URL에 일정 ID와 댓글 ID를 전달하고, 요청 본문에 수정할 댓글
 
 ## 🗺️ Diagram + ERD
 
-![img.png](Images/ScheduleDiagram.jpg)
+![img.png](Images/Diagram.png)
+![img.png](Images/ERD.png)
