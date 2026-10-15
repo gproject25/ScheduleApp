@@ -19,22 +19,10 @@ Notion 링크: https://bolder-shrimp-6f4.notion.site/Spring-6-CH-3-3f9df7a8441c8
 ---
 
 ## 📌 목차
-- [기술 스택](#️-기술-스택)
 - [API 명세서](#-api-명세서)
-- [ERD](#-erd)
+- [Diagram + ERD](#-erd)
 
 ---
-
-## 🛠️ 기술 스택
-- Language: Java
-- Framework: Spring Boot
-- ORM: Spring Data JPA
-- Database: MySQL
-- Bulid Tool: Gradle
-- API test: Postman
-
----
-
 
 --------
 ## 📑 API 명세서
@@ -354,5 +342,6 @@ URL에 일정 ID와 댓글 ID를 전달하고, 요청 본문에 수정할 댓글
 
 
 
-## 🗺️ ERD
+## 🗺️ Diagram + ERD
 
+![img.png](Images/ScheduleDiagram.jpg)
