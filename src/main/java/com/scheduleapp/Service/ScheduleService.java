@@ -59,14 +59,8 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public List<GetAllScheduleResponse> getAllSchedules(String author) {
-        List<Schedule> schedules;
         //author이 포함되어 있으면 author 기준으로 전체 조회
-        if(author != null && !author.isBlank()){
-            schedules = scheduleRepository.findByAuthor(author);
-        }
-        else{   //author이 포함되어 있지 않으면 -> 그냥 전체 조회
-            schedules = scheduleRepository.findAll();
-        }
+        List<Schedule> schedules = scheduleRepository.findSchedules(author);
 
         //stream 형식으로 DTO list 반환
         List<GetAllScheduleResponse> list = schedules.stream()
