@@ -20,7 +20,7 @@ Notion 링크: https://bolder-shrimp-6f4.notion.site/Spring-6-CH-3-3f9df7a8441c8
 
 ## 📌 목차
 - [API 명세서](#-api-명세서)
-- [Diagram + ERD](#-erd)
+- [Diagram + ERD](#%EF%B8%8F-diagram--erd)
 
 ---
 
@@ -344,4 +344,5 @@ URL에 일정 ID와 댓글 ID를 전달하고, 요청 본문에 수정할 댓글
 
 ## 🗺️ Diagram + ERD
 
-![img.png](Images/ScheduleDiagram.jpg)
+![img.png](Images/Diagram.png)
+![img.png](Images/ERD.png)
