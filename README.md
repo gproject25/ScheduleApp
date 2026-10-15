@@ -322,6 +322,7 @@ URL에 일정 ID와 댓글 ID를 전달하고, 요청 본문에 수정할 댓글
 ```json
 {
   "contents": "수정된 댓글입니다.",
+  "author": "전주한",
   "password": "password123"
 }
 ```

@@ -16,30 +16,31 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/schedules")
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
-    @PostMapping("/schedules")
+    @PostMapping
     public ResponseEntity<CreateScheduleResponse> createSchedule(@RequestBody CreateScheduleRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.createSchedule(request));
     }
 
-    @GetMapping("/schedules/{scheduleId}")
+    @GetMapping("/{scheduleId}")
     public ResponseEntity<GetScheduleResponse> getOneSchedule(@PathVariable Long scheduleId){
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getOneSchedule(scheduleId));
     }
 
-    @GetMapping("/schedules")
+    @GetMapping
     public ResponseEntity<List<GetAllScheduleResponse>> getAllSchedules(@RequestParam(required = false) String author){
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getAllSchedules(author));
     }
 
-    @PutMapping("/schedules/{scheduleId}")
+    @PutMapping("/{scheduleId}")
     public ResponseEntity<UpdateScheduleResponse> updateSchedule(@PathVariable Long scheduleId, @RequestBody UpdateScheduleRequest request){
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.updateSchedule(scheduleId,request));
     }
 
-    @DeleteMapping("/schedules/{scheduleId}")
+    @DeleteMapping("/{scheduleId}")
     public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId){
         scheduleService.deleteSchedule(scheduleId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
